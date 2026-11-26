@@ -1,17 +1,17 @@
 ##
-## digiserve/ab-relay
+## ghcr.io/cruglobal-ai/ab-relay
 ##
 ## This is our microservice for managing communications with our MCC relay server.
 ##
 ## Docker Commands:
 ## ---------------
-## $ docker build -t digiserve/ab-relay:develop .
-## $ docker push digiserve/ab-relay:develop
+## $ docker build -t ghcr.io/cruglobal-ai/ab-relay:develop .
+## $ docker push ghcr.io/cruglobal-ai/ab-relay:develop
 ##
 
 ARG BRANCH=master
 
-FROM digiserve/service-cli:${BRANCH}
+FROM ghcr.io/cruglobal-ai/service-cli:${BRANCH}
 
 COPY . /app
 

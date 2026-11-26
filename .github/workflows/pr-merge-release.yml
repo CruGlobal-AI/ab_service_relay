@@ -8,33 +8,33 @@ permissions:
 jobs:
   call-get-label:
     name: Label
-    uses: digi-serve/.github/.github/workflows/get-pr-release-label.yml@master
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/get-pr-release-label.yml@main
   call-e2e-tests:
     name: Test
     needs: [call-get-label]
     # Only run if the PR closed by merging and we have a label
     if: ${{ github.event.pull_request.merged && needs.call-get-label.outputs.valid == 'true' }}
-    uses: digi-serve/.github/.github/workflows/cypress-e2e-tests.yml@master
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/cypress-e2e-tests.yml@main
   call-bump-version:
     name: Version
     # Only run if tests pass 
     needs: [ call-get-label, call-e2e-tests ]
-    uses: digi-serve/.github/.github/workflows/bump-version.yml@master
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/bump-version.yml@main
     with:
       ref: ${{ github.ref }}
       type: ${{ needs.call-get-label.outputs.label }}
   call-create-release:
     name: Release
-    uses: digi-serve/.github/.github/workflows/create-release.yml@master
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/create-release.yml@main
     needs: [call-bump-version]
     with:
       tag: v${{ needs.call-bump-version.outputs.new_version }}
   call-docker-build:
-    uses: digi-serve/.github/.github/workflows/docker-build.yml@master
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/docker-build.yml@main
+    permissions:
+      contents: read
+      packages: write
     needs: [call-bump-version]
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     with:
       base_tag: master
       tags: master,develop,${{ needs.call-bump-version.outputs.new_version }}
@@ -59,7 +59,7 @@ jobs:
           NAME: ${{ steps.short-name.outputs.service }}
         with:
           token: ${{ secrets.PAT }}
-          repository: digi-serve/ab_runtime
+          repository: ${{ github.repository_owner }}/ab_runtime
           event-type: service_new_version
           client-payload: '{"type": "${{ env.TYPE }}", "version": "${{ env.VERS }}", "service": "${{ env.NAME }}"}'
           
